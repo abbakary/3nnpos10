@@ -644,12 +644,16 @@ class InvoiceLineItem(models.Model):
         ordering = ['invoice', 'created_at']
 
     def save(self, *args, **kwargs):
-        self.line_total = self.quantity * self.unit_price
-        self.tax_amount = self.line_total * (self.tax_rate / 100) if self.tax_rate else Decimal('0')
+        # Only recalculate line_total if it wasn't explicitly set (from extraction)
+        # This preserves extracted values from invoices while supporting manual entry
+        if not self.line_total or self.line_total == Decimal('0'):
+            self.line_total = self.quantity * self.unit_price
+
+        # Only recalculate tax_amount if it wasn't explicitly set
+        if not self.tax_amount or self.tax_amount == Decimal('0'):
+            self.tax_amount = self.line_total * (self.tax_rate / 100) if self.tax_rate else Decimal('0')
+
         super().save(*args, **kwargs)
-        # Recalculate invoice totals
-        if self.invoice:
-            self.invoice.calculate_totals().save()
 
     def __str__(self) -> str:
         return f"{self.description} x {self.quantity}"
