@@ -300,11 +300,11 @@ def started_orders_dashboard(request):
         # Specific status requested
         orders = base_orders.filter(status=status_filter).select_related('customer', 'vehicle')
     else:
-        # Default: show active orders (created/in_progress) + completed from today
+        # Default: show active orders (created/in_progress/overdue) + completed from today
         from django.db.models import Q
         today = timezone.now().date()
         orders = base_orders.filter(
-            Q(status__in=['created', 'in_progress']) |  # All active orders
+            Q(status__in=['created', 'in_progress', 'overdue']) |  # All active orders (including overdue)
             Q(status='completed', completed_at__date=today)  # Completed today
         ).select_related('customer', 'vehicle')
 
