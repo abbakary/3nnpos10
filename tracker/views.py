@@ -350,8 +350,6 @@ def dashboard(request: HttpRequest):
         
         # Revenue KPI Calculations from Invoices
         # New accurate metrics: Gross Revenue (subtotal + VAT) for both this month and all-time
-        from decimal import Decimal
-        from django.db.models import Sum, Count, Avg
         from tracker.models import Invoice
 
         gross_revenue_this_month = Decimal('0')
