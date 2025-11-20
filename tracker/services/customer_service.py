@@ -523,11 +523,13 @@ class OrderService:
                 # Mark as in progress if still created (customer has arrived and service starts)
                 if order.status == 'created':
                     order.started_at = order.started_at or timezone.now()
+                    # Transition to in_progress so overdue logic works correctly
+                    order.status = 'in_progress'
 
                 order.save()
 
-                # Update customer visit tracking
-                CustomerService.update_customer_visit(customer)
+                # NOTE: Do NOT call update_customer_visit here - it's already been called
+                # when the order was created via OrderService.create_order()
 
                 return order
         except Exception as e:
