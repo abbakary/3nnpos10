@@ -12,9 +12,10 @@
       <form id="invoiceUploadForm" method="post" action="{% url 'tracker:api_create_invoice_from_upload' %}">
         {% csrf_token %}
         <input type="hidden" name="selected_order_id" value="{{ order.id }}">
-        {% if vehicle and vehicle.plate_number %}<input type="hidden" name="plate" value="{{ vehicle.plate_number }}">{% endif %}
-        {% if order.customer %}<input type="hidden" name="customer_id" value="{{ order.customer.id }}">{% endif %}
-        {% if order.customer %}<input type="hidden" name="pre_selected_customer_id" value="{{ order.customer.id }}">{% endif %}
+        <input type="hidden" name="plate" value="{% if vehicle and vehicle.plate_number %}{{ vehicle.plate_number }}{% endif %}">
+        <!-- Customer ID hidden fields - always present, populated by template or JavaScript to prevent duplicate customer creation -->
+        <input type="hidden" id="formCustomerId" name="customer_id" value="{% if order.customer %}{{ order.customer.id }}{% endif %}">
+        <input type="hidden" id="formPreSelectedCustomerId" name="pre_selected_customer_id" value="{% if order.customer %}{{ order.customer.id }}{% endif %}">
 
         <!-- Hidden fields for extracted data -->
         <div id="extractedHiddenFields"></div>
