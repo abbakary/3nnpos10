@@ -105,25 +105,25 @@
 
               <hr class="my-3">
 
-              <!-- Invoice Information -->
-              <div class="mb-3">
-                <h6 class="text-muted mb-2"><i class="fa fa-file-invoice me-2"></i>Invoice Details</h6>
-                <div class="row g-2">
+              <!-- Invoice Information - Editable -->
+              <div class="mb-4">
+                <h6 class="text-muted mb-3"><i class="fa fa-file-invoice me-2"></i>Invoice Details</h6>
+                <div class="row g-3">
                   <div class="col-md-6">
-                    <small class="text-muted d-block">Invoice Number</small>
-                    <p id="previewInvoiceNo" class="mb-2"><strong>-</strong></p>
+                    <label class="form-label small fw-medium">Invoice Number</label>
+                    <input type="text" id="editableInvoiceNo" class="form-control form-control-sm" placeholder="Invoice number">
                   </div>
                   <div class="col-md-6">
-                    <small class="text-muted d-block">Invoice Date</small>
-                    <p id="previewInvoiceDate" class="mb-2"><strong>-</strong></p>
+                    <label class="form-label small fw-medium">Invoice Date</label>
+                    <input type="date" id="editableInvoiceDate" class="form-control form-control-sm">
                   </div>
                   <div class="col-md-6">
-                    <small class="text-muted d-block">Code No</small>
-                    <p id="previewCodeNo" class="mb-2">-</p>
+                    <label class="form-label small fw-medium">Code No</label>
+                    <input type="text" id="editableCodeNo" class="form-control form-control-sm" placeholder="Supplier code number">
                   </div>
                   <div class="col-md-6">
-                    <small class="text-muted d-block">Reference</small>
-                    <p id="previewReference" class="mb-2">-</p>
+                    <label class="form-label small fw-medium">Reference</label>
+                    <input type="text" id="editableReference" class="form-control form-control-sm" placeholder="Customer PO or reference">
                   </div>
                 </div>
               </div>
