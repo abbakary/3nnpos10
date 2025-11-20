@@ -349,6 +349,27 @@
   invoiceForm.addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Validate required fields
+    const customerName = document.getElementById('editableCustomerName')?.value.trim();
+    const customerPhone = document.getElementById('editableCustomerPhone')?.value.trim();
+
+    if (!customerName) {
+      errorBox.style.display = 'block';
+      errorBox.innerHTML = '<i class="fa fa-warning me-2"></i>Customer name is required.';
+      errorBox.className = 'alert alert-warning';
+      return;
+    }
+
+    if (!customerPhone) {
+      errorBox.style.display = 'block';
+      errorBox.innerHTML = '<i class="fa fa-warning me-2"></i>Customer phone is required.';
+      errorBox.className = 'alert alert-warning';
+      return;
+    }
+
+    // Update form fields from editable inputs
+    updateFormFieldsFromEditable();
+
     if (!fileInput.files || !fileInput.files[0]) {
       errorBox.style.display = 'block';
       errorBox.innerHTML = '<i class="fa fa-warning me-2"></i>No PDF file was uploaded or extracted.';
