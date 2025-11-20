@@ -236,20 +236,20 @@ def create_sample_data():
         'Engine tune-up and diagnostics',
         'Transmission fluid service'
     ]
-    
+
     order_num = 0
-    for status, base_days_ago in order_configs:
+    for status in order_statuses:
         order_num += 1
-        
+
         # Select random customer and vehicle
         customer = random.choice(customers)
         vehicle = random.choice(customer.vehicles.all()) if customer.vehicles.exists() else None
         order_type = random.choice(['service', 'sales', 'service'])
         priority = random.choice(['low', 'medium', 'high', 'urgent'])
-        
-        # Generate timestamps
-        created_at, started_at, completed_at, cancelled_at = create_timestamps_for_status(status, base_days_ago)
-        
+
+        # Generate timestamps based on auto-progression flow
+        created_at, started_at, completed_at, cancelled_at = create_timestamps_for_status(status)
+
         order_data = {
             'customer': customer,
             'vehicle': vehicle,
@@ -261,13 +261,17 @@ def create_sample_data():
             'estimated_duration': random.randint(60, 480),
             'assigned_to': staff_user if random.choice([True, False]) else None,
         }
-        
-        # Set timestamps
+
+        # Set timestamps based on status
+        # IMPORTANT: Only set started_at for in_progress, overdue, completed, cancelled
+        # Do NOT set started_at for 'created' orders - middleware will set it after 10 minutes
         if started_at:
             order_data['started_at'] = started_at
+
         if completed_at:
             order_data['completed_at'] = completed_at
             order_data['completion_date'] = completed_at
+
         if cancelled_at:
             order_data['cancelled_at'] = cancelled_at
             order_data['cancellation_reason'] = random.choice([
@@ -276,7 +280,7 @@ def create_sample_data():
                 'Weather conditions',
                 'Customer no-show'
             ])
-        
+
         # Type-specific data
         if order_type == 'service':
             order_data['description'] = random.choice(service_descriptions)
@@ -286,18 +290,30 @@ def create_sample_data():
             order_data['brand'] = item.brand.name
             order_data['quantity'] = random.randint(1, 4)
             order_data['tire_type'] = 'New'
-        
+
         try:
             order = Order.objects.create(**order_data)
             orders_by_status[status].append(order)
-            
+
             # Update customer visit tracking
             customer.total_visits = (customer.total_visits or 0) + 1
             customer.last_visit = created_at
             customer.save(update_fields=['total_visits', 'last_visit'])
-            
+
+            # Display order with timestamp info
             status_display = status.replace('_', ' ').upper().ljust(12)
-            print(f"{order_num:2d}. {order.order_number:20s} | {customer.full_name:25s} | {status_display} | {order_type.upper()}")
+            age_info = ""
+            if status == 'created':
+                minutes_ago = int((now - created_at).total_seconds() / 60)
+                age_info = f" (created {minutes_ago} min ago)"
+            elif status == 'in_progress':
+                minutes_ago = int((now - created_at).total_seconds() / 60)
+                age_info = f" (auto-progressed {minutes_ago} min ago)"
+            elif status == 'overdue':
+                hours_ago = (now - created_at).total_seconds() / 3600
+                age_info = f" (in progress {hours_ago:.1f} hours)"
+
+            print(f"{order_num:2d}. {order.order_number:20s} | {customer.full_name:25s} | {status_display} | {order_type.upper()}{age_info}")
         except Exception as e:
             print(f"  ✗ Error creating order: {e}")
     
